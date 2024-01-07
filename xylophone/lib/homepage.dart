@@ -8,21 +8,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late AssetsAudioPlayer _assetsAudioPlayer;
-
+  late AssetsAudioPlayer assetsAudioPlayer;
   final colors = [
     Colors.red,Colors.green,Colors.blue,Colors.yellow,
     Colors.deepOrange,Colors.deepPurple,Colors.pink
   ];
   @override
   void initState() {
-    // TODO: implement initState
+    assetsAudioPlayer = AssetsAudioPlayer.newPlayer();
     super.initState();
-    _assetsAudioPlayer = AssetsAudioPlayer.newPlayer();
   }
-
   void play(int index) async {
-    _assetsAudioPlayer.open(
+    assetsAudioPlayer.open(
       Audio('assets/notes/${index + 1}.wav'),
       autoStart: true,
     );
