@@ -9,7 +9,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<ToDo> items = [];
   final toDoController = TextEditingController();
-
   void addItem(){
     ToDo newItem = ToDo(
         id: DateTime.now().second.toString(),
@@ -21,7 +20,30 @@ class _HomeScreenState extends State<HomeScreen> {
       items.add(newItem);
     });
   }
-
+  void updateItem(ToDo toDo){
+    int index = items.indexOf(toDo);
+    setState(() {
+      items[index].isDone = !items[index].isDone;
+    });
+  }
+  void deleteItem(ToDo toDo){
+    setState(() {
+      items.remove(toDo);
+    });
+  }
+  void filter(String query){
+    List<ToDo> results = [];
+    if(query.isEmpty) {
+      results = items;
+    } else{
+      results = items
+          .where((i) => i.toDoText.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
+    setState(() {
+      items = results;
+    });
+  }
   AppBar buildAppBar(){
     return AppBar(
       backgroundColor: tdBGColor,
@@ -49,8 +71,9 @@ class _HomeScreenState extends State<HomeScreen> {
            color: Colors.white,
            borderRadius: BorderRadius.circular(20)
        ),
-       child: const TextField(
-         decoration: InputDecoration(
+       child: TextField(
+         onChanged: (String? text)=> filter(text!),
+         decoration: const InputDecoration(
            contentPadding: EdgeInsets.all(0),
            prefixIcon: Icon(Icons.search,color: tdBlack,size: 20),
            prefixIconConstraints: BoxConstraints(maxHeight: 20,minWidth: 25),
@@ -65,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       child: ListTile(
-        onTap: (){},
+        onTap: ()=> updateItem(toDo),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 20,vertical: 5),
         tileColor: Colors.white,
@@ -80,6 +103,21 @@ class _HomeScreenState extends State<HomeScreen> {
               color: tdBlack,
               decoration: toDo.isDone ? TextDecoration.lineThrough : null
           )
+        ),
+        trailing: Container(
+          padding: const EdgeInsets.all(0),
+          margin: const EdgeInsets.symmetric(vertical: 12),
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+              color: tdRed,
+            borderRadius: BorderRadius.circular(5)
+          ),
+          alignment: Alignment.center,
+          child: IconButton(
+            onPressed: ()=> deleteItem(toDo),
+            icon: const Icon(Icons.delete,color: Colors.white)
+          ),
         ),
       ),
     );
