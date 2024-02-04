@@ -1,5 +1,7 @@
 import 'package:addtodo/todo.dart';
+import 'package:addtodo/todo_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'colors.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,6 +11,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<ToDo> items = [];
   final toDoController = TextEditingController();
+
   void addItem(){
     ToDo newItem = ToDo(
         id: DateTime.now().second.toString(),
@@ -44,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
       items = results;
     });
   }
+
   AppBar buildAppBar(){
     return AppBar(
       backgroundColor: tdBGColor,
@@ -128,67 +132,71 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: tdBGColor,
       appBar: buildAppBar(),
-      body: Stack(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 15),
-            child: Column(
-              children: [
-                searchBox(),
-                Expanded(
-                    child: ListView(
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(top: 20,bottom: 20),
-                          child: const Text('All ToDos',
-                            style: TextStyle(fontSize: 30,fontWeight: FontWeight.w500)
+      body: Consumer<ToDoProvider>(
+        builder: (context,data,child){
+          return Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 15),
+                child: Column(
+                  children: [
+                    searchBox(),
+                    Expanded(
+                        child: ListView(
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(top: 20,bottom: 20),
+                              child: const Text('All ToDos',
+                                  style: TextStyle(fontSize: 30,fontWeight: FontWeight.w500)
+                              ),
+                            ),
+                            for(ToDo item in data.items.reversed)
+                              buildToDoItem(item)
+                          ],
+                        )
+                    )
+                  ],
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 20,right: 20,left: 20),
+                          padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 5),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10)
                           ),
-                        ),
-                        for(ToDo item in items.reversed)
-                          buildToDoItem(item)
-                      ],
-                    )
-                )
-              ],
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Row(
-              children: [
-                Expanded(
-                    child: Container(
-                        margin: const EdgeInsets.only(bottom: 20,right: 20,left: 20),
-                      padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10)
-                      ),
-                      child: TextField(
-                        controller: toDoController,
-                        decoration: const InputDecoration(
-                          hintText: 'Add a new todo item',
-                          border: InputBorder.none
-                        ),
-                      ),
-                    )
-                ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 20,right: 20),
-                  child: ElevatedButton(
-                    onPressed: ()=> addItem(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: tdOrange,
-                      minimumSize: const Size(65,65),
-                      elevation: 10
+                          child: TextField(
+                            controller: toDoController,
+                            decoration: const InputDecoration(
+                                hintText: 'Add a new todo item',
+                                border: InputBorder.none
+                            ),
+                          ),
+                        )
                     ),
-                    child: const Icon(Icons.add),
-                  ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 20,right: 20),
+                      child: ElevatedButton(
+                        onPressed: ()=> addItem(),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: tdOrange,
+                            minimumSize: const Size(65,65),
+                            elevation: 10
+                        ),
+                        child: const Icon(Icons.add),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          )
-        ],
+              )
+            ],
+          );
+        },
       ),
     );
   }
